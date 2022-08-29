@@ -12,6 +12,7 @@ $getResponse = $service->get($request);
 $res = $getResponse->readResponse->record;
 //echo json_encode($res);
 
+//PARA GENERAR ORDEN CABECERA
 $dN = '1';
 $tranId = 'PO'.$res->tranId;
 $Origen = 'N';
@@ -25,6 +26,27 @@ switch ($res->currencyName) {
         break;
 }
 
+$cabecera = array(
+    'DocNum',
+    'NumPedido',
+    'OrigenOrdenRecibo',
+    'CodProveedorCliente',
+    'CodProveedorCliente',
+    'CodProveedordeCliente',
+    'PorcentajeMuestreo'
+);
+
+$datos = array(
+    $dN,
+    $tranId,
+    $Origen,
+    $CodProvCli,
+    $NomProvCli,
+    $FechaOrdenRecibo
+);
+DownloadExcel::createExcel($datos, $cabecera, 'OrdenCabecera');
+
+//PARA GENERAR ORDEN DETALLE
 $itemList = $res->itemList->item;
 //echo json_encode($itemList);
 
@@ -57,6 +79,5 @@ $headers = array(
     'CodigoAlmacen',
     'UomEntry'
 );
-
-DownloadExcel::createExcel($data, $headers);
+DownloadExcel::createExcel($data, $headers, 'OrdenDetalle');
 ?>

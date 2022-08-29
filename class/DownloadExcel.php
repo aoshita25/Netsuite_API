@@ -7,7 +7,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class DownloadExcel
 {
-    public static function createExcel(array $data, array $headers)
+    public static function createExcel(array $data, array $headers, string $file)
     {
         $spreadsheet = new Spreadsheet();
         $spreadsheet->setActiveSheetIndex(0);
@@ -27,7 +27,7 @@ class DownloadExcel
         }
 
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="data.csv"');
+        header('Content-Disposition: attachment;filename="'.$file.'.csv"');
         header('Cache-Control: max-age=0');
         
         $writer = IOFactory::createWriter($spreadsheet, 'Csv');
