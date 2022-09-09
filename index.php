@@ -12,7 +12,8 @@
             var intId = $("#intId").val();
             var registro = $("#registros").val();
             $.post("prueba.php",{"id":intId, "tipo":registro},function(res){
-                console.log(res);
+                alert(res)
+                //console.log(res);
 		    });
         }
     </script>
