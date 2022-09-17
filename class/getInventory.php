@@ -8,6 +8,24 @@ class getInventory {
         $request->baseRef->internalId = $internalId;
         $request->baseRef->type = "inventoryItem";
         $getResponse = $service->get($request);
+        $status = $getResponse->readResponse->status->statusDetail;
+
+        if (isset($status[0]->type) && $status[0]->type == "ERROR"){
+            $request = new GetRequest();
+            $request->baseRef = new RecordRef();
+            $request->baseRef->internalId = $internalId;
+            $request->baseRef->type = "lotNumberedInventoryItem";
+            $getResponse = $service->get($request);
+            $status = $getResponse->readResponse->status->statusDetail;
+            //Si tampoco es lote se consulta por serie
+            if (isset($status[0]->type) && $status[0]->type == "ERROR"){
+                $request = new GetRequest();
+                $request->baseRef = new RecordRef();
+                $request->baseRef->internalId = $internalId;
+                $request->baseRef->type = "serializedInventoryItem";
+                $getResponse = $service->get($request);
+            }
+        }
 
         if (!$getResponse->readResponse->status->isSuccess) {
             echo "OCURRIÓ UN ERROR";
@@ -56,37 +74,12 @@ class getInventory {
             $Abastecimiento = 'bom_Buy';
             $PorAlmacen = 'Y';
         }
-        /*
-        $data = array([
-            $CodigoArticulo,
-            $CodigoArticuloClienteSolum,
-            $NombreArticulo,
-            $GrupoInternoSAP,
-            $UoMGroupEntry,
-            $CodCliente,
-            $Cliente,
-            $FamiliaArticulo,
-            $SubFamiliaArticulo,
-            $TipoMercaderia,
-            $ArticuloRecepcion,
-            $ArticuloDespacho,
-            $ArticuloInventariable,
-            $GestionSeries,
-            $GestionLotes,
-            $UnidadMedRecepcion,
-            $UnidadInventario,
-            $UnidadDespacho,
-            $GestionEnTodasTransacciones,
-            $Planeamiento,
-            $Abastecimiento,
-            $PorAlmacen
-        ]);*/
 
         $data = array(
             'CodigoArticulo'              => $CodigoArticulo,
             'CodigoArticuloClienteSolum'  => $CodigoArticuloClienteSolum,
             'NombreArticulo'              => $NombreArticulo,
-            'GrupoInternoSAP'             =>  $GrupoInternoSAP,
+            'GrupoInternoSAP'             => $GrupoInternoSAP,
             'UoMGroupEntry'               => $UoMGroupEntry,
             'CodCliente'                  => $CodCliente,
             'Cliente'                     => $Cliente,
@@ -106,7 +99,35 @@ class getInventory {
             'Abastecimiento'              => $Abastecimiento,
             'PorAlmacen'                  => $PorAlmacen
         );
-        return $data;
-        //DownloadExcel::createExcel($data, $headers, 'Articulo');
+        
+        $headers = "";
+        $detalle = "";
+
+        foreach ($data as $key => $value) {
+
+            if (mb_strlen($key) > mb_strlen($value)) {
+                $detalle .= str_pad($value, mb_strlen($key));
+                $headers .= $key;
+            }elseif (mb_strlen($key) < mb_strlen($value)) {
+                $headers .= str_pad($key, mb_strlen($value));
+                $detalle .= $value;
+            }
+
+            $headers .= "\t";
+            $detalle .= "\t";
+        }
+
+        $texto = $headers."\n".$detalle;
+
+        $today = new DateTime();
+        $today->setTimezone(new DateTimeZone('America/Lima'));
+        $newToday = $today->format("YmdHis");  
+        //Genera archivo txt
+        $filename = 'SAP_PRD_'.$newToday.'.txt';
+        $fh = fopen($filename, 'w');
+        fwrite($fh, $texto);
+        fclose($fh);
+        
+        return $filename;
     }
 }

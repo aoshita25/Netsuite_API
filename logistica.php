@@ -2,25 +2,25 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="index.css">
-    <title>Gestion de Netsuite</title>
+    <link rel="stylesheet" type="text/css" href="logistica.css">
+    <title>Gestion Logistica</title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js" type="text/javascript"></script>
 
     <script>
         function submit(){
             //var intId = document.getElementById('intId').value
-            var intId = $("#intId").val();
-            var registro = $("#registros").val();
-            $.post("prueba.php",{"id":intId, "tipo":registro},function(res){
-                alert(res)
-                //console.log(res);
+            var intId = $("#intId").val()
+            var registro = $("#registros").val()
+            $.post("BE_logistica.php",{"id":intId, "tipo":registro},function(res){
+                //alert(res)
+                console.log(res);
 		    });
         }
     </script>
 
 </head>
 <body>
-     <h1>Reportes Netsuite</h1>
+     <h1>Intranet Netsuite - Logística</h1>
      <div id="Content">
         <select class="form-select" id="registros">
             <option selected>Seleccione registro</option>
@@ -32,7 +32,7 @@
         <input type="text" id="intId" placeholder="Ingrese ID">
      </div>
     <div>
-        <button class="btn" onclick="submit()">GET</button>
+        <button class="btn" onclick="submit()">Submit</button>
     </div>
 </body> 
 </html>

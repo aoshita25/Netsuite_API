@@ -21,7 +21,7 @@ class getTransferOrder {
                 $clase = "";
             }
 
-            $tranId = $clase.$res->tranId;
+            $tranId = $res->tranId;
 
             $fechaPedDesp = date('Ymd', strtotime(explode("T",$res->tranDate)[0]));
             $CodCliSolum = "C20605977406";
@@ -66,7 +66,7 @@ class getTransferOrder {
                 'HoraInicio'                    => "",
                 'FechaFinEntrega'               => "",
                 'HoraFin'                       => "",
-                'TipoCanal'                     => "",
+                'TipoCanal'                     => $clase,
                 'LoteFacturacion'               => "",
                 'CondicionesPago2'              => "-1",
             );
@@ -84,17 +84,18 @@ class getTransferOrder {
                     $detalle .= $value;
                 }
 
-                $headers .= "     ";
-                $detalle .= "     ";
+                $detalle .= "\t";
+                $headers .= "\t";
             }
 
             $texto = $headers."\n".$detalle;
 
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
-            $newToday = $today->format("YmdHis");  
+            $newToday = $today->format("YmdHis");
+            $filename_cab = 'SAP_OD_CAB_'.$newToday.'.txt';
             //Genera archivo txt
-            $fh = fopen('SAP_OD_CAB_'.$newToday.'.txt', 'w');
+            $fh = fopen($filename_cab, 'w');
             fwrite($fh, $texto);
             fclose($fh);
 
@@ -114,8 +115,7 @@ class getTransferOrder {
                     'CorrelativoDocumento'          => "",
                     'CorrelativoLinea'              => $cont,
                     'CodArticulo'                   => 'wo'.$value->item->internalId,
-                    'DescripcionArticuloCliente'    => $value->description,
-                    'Cantidad'                      => $value->quantity,
+                    'DescripcionArticuloCliente'    => explode(" ",$value->item->name)[1],                    'Cantidad'                      => $value->quantity,
                     'UnidadesInventarioporCantidad' => '1',
                     'MonedadelPrecio'               => "",
                     'PrecioporUndMedInventario'     => "",
@@ -151,11 +151,14 @@ class getTransferOrder {
 
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
-            $newToday = $today->format("YmdHis");  
+            $newToday = $today->format("YmdHis");
+            $filename_det = 'SAP_OD_DET_'.$newToday.'.txt';
             //Genera archivo txt
-            $fh = fopen('SAP_OD_DET_'.$newToday.'.txt', 'w');
+            $fh = fopen($filename_det, 'w');
             fwrite($fh, $texto);
             fclose($fh);
+            
+            return [$filename_cab, $filename_det];
         }
     }
 }
