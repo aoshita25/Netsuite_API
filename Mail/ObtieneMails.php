@@ -3,9 +3,9 @@
 class ObtieneMails{
  
     //usuario de outlook, email a donde deseamos conectarnos
-    var $user="angeloshita@outlook.com"; //jce@wowperu.pe
+    var $user=""; //
     //password de nuestro email
-    var $password="familia4"; //Danna1811*
+    var $password=""; //Danna1811*
     //inforrmación necesaria para conectarnos al INBOX de gmail,
     //incluye el servidor, el puerto 993 que es para imap, e indicamos que no valide con ssl
     var $mailbox="{outlook.office365.com:993/imap/ssl/novalidate-cert}INBOX";
