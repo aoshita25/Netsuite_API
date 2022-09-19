@@ -6,10 +6,10 @@ require_once 'class/getTransferOrder.php';
 require_once 'PHPToolkit/NetSuiteService.php';
 require 'vendor/autoload.php';
 
-define("SERVER","20.94.40.28"); //IP del servidor
-define("PORT",21); //Puerto
-define("USER","wow"); //Usuario
-define("PASSWORD","W0VV$@792022"); //Contraseña
+define("SERVER",""); //IP del servidor
+define("PORT",""); //Puerto
+define("USER",""); //Usuario
+define("PASSWORD",""); //Contraseña
 
 $id_ftp=ftp_connect(SERVER,PORT) or die("No se pudo conectar");
 ftp_login($id_ftp,USER,PASSWORD);

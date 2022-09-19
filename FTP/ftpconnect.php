@@ -1,9 +1,9 @@
 <?php
 //CONSTANTES
-define("SERVER","20.94.40.28"); //IP del servidor
-define("PORT",21); //Puerto
-define("USER","wow"); //Usuario
-define("PASSWORD","W0VV$@792022"); //Contraseña
+define("SERVER",""); //IP del servidor
+define("PORT",""); //Puerto
+define("USER",""); //Usuario
+define("PASSWORD",""); //Contraseña
 
 //Conexion al servidor
 $id_ftp=ftp_connect(SERVER,PORT) or die("No se pudo conextar");

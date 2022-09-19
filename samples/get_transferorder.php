@@ -7,7 +7,7 @@ $service = new NetSuiteService();
 
 $request = new GetRequest();
 $request->baseRef = new RecordRef();
-$request->baseRef->internalId = "1509654"; //1509654,1509655
+$request->baseRef->internalId = "";
 $request->baseRef->type = "transferOrder";
 $getResponse = $service->get($request);
 $res = $getResponse->readResponse->record;

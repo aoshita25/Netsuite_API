@@ -8,7 +8,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 $service = new NetSuiteService();
 $request = new GetRequest();
 $request->baseRef = new RecordRef();
-$request->baseRef->internalId = "1094";
+$request->baseRef->internalId = "";
 $request->baseRef->type = "inventoryItem";
 $getResponse = $service->get($request);
 

@@ -6,7 +6,7 @@ require '../vendor/autoload.php';
 $service = new NetSuiteService();
 $request = new GetRequest();
 $request->baseRef = new RecordRef();
-$request->baseRef->internalId = "1047664";
+$request->baseRef->internalId = "";
 $request->baseRef->type = "purchaseOrder";
 $getResponse = $service->get($request);
 $res = $getResponse->readResponse->record;
