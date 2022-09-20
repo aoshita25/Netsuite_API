@@ -2,7 +2,7 @@
 
 $routesArray = array_filter(explode("/",$_SERVER['REQUEST_URI']));
 
-if(count($routesArray) == 1){
+if(count($routesArray) == 0){
     $json = array(
         'status' => 400,
         'result' => 'Not found'
@@ -12,11 +12,17 @@ if(count($routesArray) == 1){
     return;
 }
 
-if(count($routesArray) > 1 && isset($_SERVER['REQUEST_METHOD'])){
+if(count($routesArray) >= 1 && isset($_SERVER['REQUEST_METHOD'])){
     
     //Peticiones GET
     if($_SERVER['REQUEST_METHOD'] == "GET"){
         
+        include "services/get.php";
+    }
+
+    //Peticiones POST
+    if($_SERVER['REQUEST_METHOD'] == "POST"){
+    
         include "services/get.php";
     }
 
