@@ -10,7 +10,7 @@ class getDevolucion {
         $getResponse = $service->get($request);
 
         if (!$getResponse->readResponse->status->isSuccess) {
-            echo "OCURRIÓ UN ERROR";
+            return $data = "";
         }else {
            //PARA GENERAR ORDEN CABECERA
            $res = $getResponse->readResponse->record;
@@ -73,9 +73,10 @@ class getDevolucion {
 
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
-            $newToday = $today->format("YmdHis");  
+            $newToday = $today->format("YmdHis");
+            $filename_cab = 'SAP_OI_CAB_'.$newToday.'.txt';
             //Genera archivo txt
-            $fh = fopen('SAP_OI_CAB_'.$newToday.'.txt', 'w');
+            $fh = fopen($filename_cab, 'w');
             fwrite($fh, $texto);
             fclose($fh);
 
@@ -133,11 +134,15 @@ class getDevolucion {
 
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
-            $newToday = $today->format("YmdHis");  
+            $newToday = $today->format("YmdHis");
+            $filename_det = 'SAP_OI_DET_'.$newToday.'.txt';
             //Genera archivo txt
-            $fh = fopen('SAP_OI_DET_'.$newToday.'.txt', 'w');
+            $fh = fopen($filename_det, 'w');
             fwrite($fh, $texto);
             fclose($fh);
+            
+            return $data;
+            //return [$filename_cab, $filename_det];
         }
     }
 }

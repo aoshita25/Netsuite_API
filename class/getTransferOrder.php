@@ -11,7 +11,7 @@ class getTransferOrder {
         $res = $getResponse->readResponse->record;
         
         if (!$getResponse->readResponse->status->isSuccess) {
-            echo "OCURRIÓ UN ERROR";
+            return $data = "";
         }else {
             //PARA GENERAR PEDIDOS CABECERA
             $dN = '1';
@@ -158,7 +158,8 @@ class getTransferOrder {
             fwrite($fh, $texto);
             fclose($fh);
             
-            return [$filename_cab, $filename_det];
+            return $data;
+            //return [$filename_cab, $filename_det];
         }
     }
 }
