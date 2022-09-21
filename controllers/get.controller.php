@@ -1,4 +1,7 @@
 <?php
+
+header('Content-type: application/json');
+
 require_once "models/get.model.php";
 
 class GetController{

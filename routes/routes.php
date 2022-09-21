@@ -1,5 +1,7 @@
 <?php
 
+header('Content-type: application/json');
+
 $routesArray = array_filter(explode("/",$_SERVER['REQUEST_URI']));
 
 if(count($routesArray) == 0){

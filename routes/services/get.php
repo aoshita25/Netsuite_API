@@ -1,4 +1,7 @@
 <?php
+
+header('Content-type: application/json');
+
 require_once "controllers/get.controller.php";
 require_once "PHPToolkit/NetSuiteService.php";
 
