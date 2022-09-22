@@ -81,11 +81,16 @@ class getPurchaseOrder {
             fclose($fh);
 
             //PARA GENERAR ORDEN DETALLE
-            switch ($res->currencyName) {
-                case "US Dollar":
-                    $currencyName = 'USD';
-                    break;
+            if(isset($res->currencyName)){
+                switch ($res->currencyName) {
+                    case "US Dollar":
+                        $currencyName = 'USD';
+                        break;
+                }
+            }else{
+                $currencyName = "";
             }
+            
             $itemList = $res->itemList->item;
 
             $data = array();
