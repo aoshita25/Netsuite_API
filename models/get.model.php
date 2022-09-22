@@ -26,9 +26,12 @@ class GetModel{
                 $fileFrom = getInventory::item($id);
                 $fileTo = $dir."/".$fileFrom;
                 $upload = ftp_put($id_ftp, $fileTo, $fileFrom, FTP_ASCII);
-                if (!$upload) {
+                if($fileFrom == 0){
+                    return "";
+                }
+                elseif(!$upload) {
                     return 'Upload failed!';
-                } else {
+                } else{
                     return 'Upload success';
                 }
                 break;
@@ -41,7 +44,10 @@ class GetModel{
                 $fileToDet = $dir."/".$fileFromDet;
                 $uploadCab = ftp_put($id_ftp, $fileToCab, $fileFromCab, FTP_ASCII);
                 $uploadDet = ftp_put($id_ftp, $fileToDet, $fileFromDet, FTP_ASCII);
-                if (!$uploadCab || !$uploadDet) {
+                if($fileFromCab == 0){
+                    return "";
+                }
+                elseif (!$uploadCab || !$uploadDet) {
                     return 'Upload failed!';
                 } else {
                     return 'Upload success';
@@ -56,7 +62,10 @@ class GetModel{
                 $fileToDet = $dir."/".$fileFromDet;
                 $uploadCab = ftp_put($id_ftp, $fileToCab, $fileFromCab, FTP_ASCII);
                 $uploadDet = ftp_put($id_ftp, $fileToDet, $fileFromDet, FTP_ASCII);
-                if (!$uploadCab || !$uploadDet) {
+                if($fileFromCab == 0){
+                    return "";
+                }
+                elseif (!$uploadCab || !$uploadDet) {
                     return 'Upload failed!';
                 } else {
                     return 'Upload success';
@@ -71,7 +80,10 @@ class GetModel{
                 $fileToDet = $dir."/".$fileFromDet;
                 $uploadCab = ftp_put($id_ftp, $fileToCab, $fileFromCab, FTP_ASCII);
                 $uploadDet = ftp_put($id_ftp, $fileToDet, $fileFromDet, FTP_ASCII);
-                if (!$uploadCab || !$uploadDet) {
+                if($fileFromCab == 0){
+                    return "";
+                }
+                elseif (!$uploadCab || !$uploadDet) {
                     return 'Upload failed!';
                 } else {
                     return 'Upload success';

@@ -10,10 +10,10 @@ class getDevolucion {
         $getResponse = $service->get($request);
 
         if (!$getResponse->readResponse->status->isSuccess) {
-            return $data = "";
+            return [0,0];
         }else {
-           //PARA GENERAR ORDEN CABECERA
-           $res = $getResponse->readResponse->record;
+            //PARA GENERAR ORDEN CABECERA
+            $res = $getResponse->readResponse->record;
             $dN = '1';
             $tranId = 'PO'.$res->tranId;
 
@@ -140,8 +140,7 @@ class getDevolucion {
             $fh = fopen($filename_det, 'w');
             fwrite($fh, $texto);
             fclose($fh);
-            
-            //return $data;
+
             return [$filename_cab, $filename_det];
         }
     }

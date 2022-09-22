@@ -9,7 +9,7 @@ class getInventory {
         $request->baseRef->type = "inventoryItem";
         $getResponse = $service->get($request);
         $status = $getResponse->readResponse->status->statusDetail;
-
+        //Si no es articulo inventario normal se consulta por lote
         if (isset($status[0]->type) && $status[0]->type == "ERROR"){
             $request = new GetRequest();
             $request->baseRef = new RecordRef();
@@ -28,7 +28,7 @@ class getInventory {
         }
 
         if (!$getResponse->readResponse->status->isSuccess) {
-            return $data = "";
+            return 0;
         }else {
             $items = $getResponse->readResponse->record;
 
@@ -37,13 +37,13 @@ class getInventory {
             $NombreArticulo = $items->displayName;
             $GrupoInternoSAP = '105';
             $UoMGroupEntry = '-1';
-            $CodCliente = 'C20261239923';
-            $Cliente = 'SEDISA S.A.C';
-
+            $CodCliente = 'C20605977406';
+            $Cliente = 'WOW TEL S.A.C.';
+            
             if (isset($items->class->name)) {
                 $FamiliaArticulo = explode(":",$items->class->name)[0];
-                $SubFamiliaArticulo = explode(":",$items->class->name)[1];
-                $DescripcionSubFamilia = $items->class->internalId;
+                $SubFamiliaArticulo = $items->class->internalId;
+                $DescripcionSubFamilia = explode(":",$items->class->name)[1];
             }else {
                 $FamiliaArticulo = "";
                 $SubFamiliaArticulo = "";
@@ -84,7 +84,7 @@ class getInventory {
             $Abastecimiento = 'bom_Buy';
             $PorAlmacen = 'Y';
             
-            $main_header = array(
+            $field = array(
                 'ItemCode',
                 'U_BZ_CODARTICULOCLI',
                 'ItemName',
@@ -102,16 +102,16 @@ class getInventory {
                 'ManageSerialNumbers',
                 'ManageBatchNumbers',
                 'PurchaseUnit',
-                'PurchaseItemsPerUnit',
+                //'PurchaseItemsPerUnit',
                 'InventoryUOM',
                 'SalesUnit',
-                'SalesItemsPerUnit',
+                //'SalesItemsPerUnit',
                 'SRIAndBatchManageMethod',
                 'PlanningSystem',
                 'ProcurementMethod',
                 'ManageStockByWarehouse'
             );
-
+            
             $data = array(
                 'CodigoArticulo'              => $CodigoArticulo,
                 'CodigoArticuloClienteSolum'  => $CodigoArticuloClienteSolum,
@@ -137,12 +137,18 @@ class getInventory {
                 'Abastecimiento'              => $Abastecimiento,
                 'PorAlmacen'                  => $PorAlmacen
             );
+
+            //$data = array_map('utf8_encode', $data);
+            $main_hearder = "";
+            $header = "";
+            $detail = "";
             
-            $headers = "";
-            $detalle = "";
-
+            foreach($field as $value){
+                $main_hearder .= $value."\t";
+            }
+            
             foreach ($data as $key => $value) {
-
+                /*
                 if (mb_strlen($key) > mb_strlen($value)) {
                     $detalle .= str_pad($value, mb_strlen($key));
                     $headers .= $key;
@@ -150,13 +156,13 @@ class getInventory {
                     $headers .= str_pad($key, mb_strlen($value));
                     $detalle .= $value;
                 }
-
-                $headers .= "\t";
-                $detalle .= "\t";
+                */
+                $header .= $key."\t";
+                $detail .= $value."\t";
             }
-
-            $texto = $headers."\n".$detalle;
-
+            
+            $texto = $main_hearder."\n".$header."\n".$detail;
+            $texto = iconv('UTF-8', 'Windows-1252', $texto);
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
             $newToday = $today->format("YmdHis");  
@@ -166,9 +172,7 @@ class getInventory {
             fwrite($fh, $texto);
             fclose($fh);
             
-            //return $data;
             return $filename;
-            
         }
     }
 }

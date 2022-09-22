@@ -2,17 +2,70 @@
 class getTransferOrder {
 
     public static function item (string $internalId){
+        $ubigeoDesc = array(
+            '150101'	=> 'Lima-Lima-Lima',  
+            '150102'	=> 'Lima-Lima-Ancón',   
+            '150103'	=> 'Lima-Lima-Ate',    
+            '150104'	=> 'Lima-Lima-Barranco',     
+            '150105'	=> 'Lima-Lima-Breña',     
+            '150106'	=> 'Lima-Lima-Carabayllo',    
+            '150107'	=> 'Lima-Lima-Chaclacayo',     
+            '150108'	=> 'Lima-Lima-Chorrillos',     
+            '150109'	=> 'Lima-Lima-Cieneguilla',     
+            '150110'	=> 'Lima-Lima-Comas',     
+            '150111'	=> 'Lima-Lima-El Agustino',    
+            '150112'	=> 'Lima-Lima-Independencia',     
+            '150113'	=> 'Lima-Lima-Jesús María',    
+            '150114'	=> 'Lima-Lima-La Molina',    
+            '150115'	=> 'Lima-Lima-La Victoria',    
+            '150116'	=> 'Lima-Lima-Lince',     
+            '150117'	=> 'Lima-Lima-Los Olivos',    
+            '150118'	=> 'Lima-Lima-Lurigancho',     
+            '150119'	=> 'Lima-Lima-Lurin',     
+            '150120'	=> 'Lima-Lima-Magdalena del Mar',   
+            '150121'	=> 'Lima-Lima-Pueblo Libre',    
+            '150122'	=> 'Lima-Lima-Miraflores',     
+            '150123'	=> 'Lima-Lima-Pachacamac',    
+            '150124'	=> 'Lima-Lima-Pucusana',     
+            '150125'	=> 'Lima-Lima-Puente Piedra',    
+            '150126'	=> 'Lima-Lima-Punta Hermosa',    
+            '150127'	=> 'Lima-Lima-Punta Negra',    
+            '150128'	=> 'Lima-Lima-Rímac',     
+            '150129'	=> 'Lima-Lima-San Bartolo',    
+            '150130'	=> 'Lima-Lima-San Borja',    
+            '150131'	=> 'Lima-Lima-San Isidro',    
+            '150132'	=> 'Lima-Lima-San Juan de Lurigancho',  
+            '150133'	=> 'Lima-Lima-San Juan de Miraflores',  
+            '150134'	=> 'Lima-Lima-San Luis',    
+            '150135'	=> 'Lima-Lima-San Martín de Porres',  
+            '150136'	=> 'Lima-Lima-San Miguel',    
+            '150137'	=> 'Lima-Lima-Santa Anita',    
+            '150138'	=> 'Lima-Lima-Santa María del Mar',  
+            '150139'	=> 'Lima-Lima-Santa Rosa',   
+            '150140'	=> 'Lima-Lima-Santiago de Surco',   
+            '150141'	=> 'Lima-Lima-Surquillo',     
+            '150142'	=> 'Lima-Lima-Villa El Salvador',   
+            '150143'	=> 'Lima-Lima-Villa María del Triunfo',  
+            '150502'	=> 'Lima-Cañete-Asia',     
+            '150504'	=> 'Lima-Cañete-Cerro Azul',    
+            '150505'	=> 'Lima-Cañete-Chilca',     
+            '150509'	=> 'Lima-Cañete-Mala',     
+            '150513'	=> 'Lima-Cañete-San Antonio'
+        );
+        
         $service = new NetSuiteService();
+        
         $request = new GetRequest();
         $request->baseRef = new RecordRef();
-        $request->baseRef->internalId = $internalId;
+        $request->baseRef->internalId = $internalId; //1509654,1509655
         $request->baseRef->type = "transferOrder";
         $getResponse = $service->get($request);
-        $res = $getResponse->readResponse->record;
+        //echo json_encode($getResponse);
         
         if (!$getResponse->readResponse->status->isSuccess) {
-            return $data = "";
+            return [0,0];
         }else {
+            $res = $getResponse->readResponse->record;
             //PARA GENERAR PEDIDOS CABECERA
             $dN = '1';
             if (isset($res->class->name)) {
@@ -20,15 +73,15 @@ class getTransferOrder {
             }else {
                 $clase = "";
             }
-
+            
             $tranId = $res->tranId;
-
+            
             $fechaPedDesp = date('Ymd', strtotime(explode("T",$res->tranDate)[0]));
             $CodCliSolum = "C20605977406";
             $CodCliCliSolum = "20605977406";
             $NombreCliCliSolum = $res->transferLocation->name;
             $fechaEntrega = date('Ymd', strtotime(explode("T",$res->shipDate)[0]));
-
+            
             $customfields = $res->customFieldList->customField;
             foreach ($customfields as $field) {
                 //echo json_encode($field);
@@ -46,7 +99,36 @@ class getTransferOrder {
                     $UbigeoDir = "";
                 }
             }
-
+            
+            $field_cab = array(
+                'DocNum',
+                'NumAtCard',
+                'U_BPP_MDTD',
+                'U_BPP_MDSD',
+                'U_BPP_MDCD',
+                'DocDate',
+                'CardCode',
+                'U_BZ_CODCLI',
+                'U_BZ_RUCCLIENTE',
+                'U_BZ_CLIENTE',
+                'Address',
+                'U_BZ_UBIGEO',
+                'Address2',
+                'GroupNum',
+                'DocDueDate',
+                'U_BZ_HICITA',
+                'U_BZ_FFINAL',
+                'U_BZ_HFCITA',
+                'U_BZ_TCANAL',
+                'U_BZ_LOTEFT',
+                'U_BZ_OBS',
+                //'U_BZ_LOCAL',
+                'U_SYP_PtoLlegada',
+                'U_SYP_DocVta'
+            
+            
+            );
+            
             $data = array(
                 'DocNum'                        => $dN,
                 'NumeroReferenciaDocumento'     => $tranId,
@@ -60,7 +142,7 @@ class getTransferOrder {
                 'NombreClientedelClienteSolum'  => $NombreCliCliSolum,
                 'DireccióndeEntrega'            => $DirEntrega,
                 'UbigeoDirección'               => $UbigeoDir,
-                'DireccióndeEntrega2'           => $DirEntrega,
+                'DireccióndeEntrega2'           => $ubigeoDesc[$UbigeoDir] ?? "",
                 'CondicionesPago'               => "",
                 'FechaEntrega'                  => $fechaEntrega,
                 'HoraInicio'                    => "",
@@ -68,14 +150,23 @@ class getTransferOrder {
                 'HoraFin'                       => "",
                 'TipoCanal'                     => $clase,
                 'LoteFacturacion'               => "",
+                'Observacion'                   => "", //revisar
+                'Punto de Llegada'              => $DirEntrega,
                 'CondicionesPago2'              => "-1",
             );
-
-            $headers = "";
-            $detalle = "";
-
+            
+            $main_header_cab = "";
+            $header = "";
+            $detail = "";
+            
+            foreach($field_cab as $value){
+                $main_header_cab .= $value."\t";
+            }
+            
             foreach ($data as $key => $value) {
-
+                $header .= $key."\t";
+                $detail .= $value."\t";
+                /*
                 if (mb_strlen($key) > mb_strlen($value)) {
                     $detalle .= str_pad($value, mb_strlen($key));
                     $headers .= $key;
@@ -83,13 +174,14 @@ class getTransferOrder {
                     $headers .= str_pad($key, mb_strlen($value));
                     $detalle .= $value;
                 }
-
-                $detalle .= "\t";
+            
                 $headers .= "\t";
+                $detalle .= "\t";
+                */
             }
-
-            $texto = $headers."\n".$detalle;
-
+            
+            $texto = $main_header_cab."\n".$header."\n".$detail;
+            
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
             $newToday = $today->format("YmdHis");
@@ -98,24 +190,46 @@ class getTransferOrder {
             $fh = fopen($filename_cab, 'w');
             fwrite($fh, $texto);
             fclose($fh);
-
-
+            
+            
             //PARA GENERAR ORDEN DETALLE
             $itemList = $res->itemList->item;
             //echo json_encode($itemList);
-
+            
             $data = array();
             $cont = 0;
+            
+            $field_det = array(
+                'Parentkey',
+                'NumAtCard',
+                'U_BPP_MDTD',
+                'U_BPP_MDSD',
+                'U_BPP_MDCD',
+                'LineNum',
+                'ItemCode',
+                'BZ_DESCARTICULO',
+                'Quantity',
+                //'MeasureUnit',
+                'UnitsOfMeasurment',
+                'Currency',
+                'Price',
+                'TaxCode',
+                'WarehouseCode',
+                'UoMEntry'
+            );
+            
+            
             foreach($itemList as $value){
                 $info=array(
                     'DocNum'                        => $dN,
-                    'NumeroReferenciaDocumento'     => $tranId,
+                    'UnidadesInventarioporCantidad' => $tranId,
                     'TipoDocumento'                 => "",
                     'SerieDocumento'                => "",
                     'CorrelativoDocumento'          => "",
                     'CorrelativoLinea'              => $cont,
                     'CodArticulo'                   => 'wo'.$value->item->internalId,
-                    'DescripcionArticuloCliente'    => explode(" ",$value->item->name)[1],                    'Cantidad'                      => $value->quantity,
+                    'DescripcionArticuloCliente'    => explode(" ",$value->item->name)[1],
+                    'Cantidad'                      => $value->quantity,
                     'UnidadesInventarioporCantidad' => '1',
                     'MonedadelPrecio'               => "",
                     'PrecioporUndMedInventario'     => "",
@@ -126,29 +240,45 @@ class getTransferOrder {
                 $cont++;
                 array_push($data, $info);
             }
-
-            $headers = "";
-            $detalle = "";
+            
+            $main_header_det = "";
+            $header = "";
+            $detail = "";
             $band = 1;
+            
+            foreach($field_det as $value){
+                $main_header_det .= $value."\t";
+            }
+            
             foreach ($data as $lista) {
+            
                 foreach ($lista as $key => $value) {
-                    if (mb_strlen($key) > mb_strlen($value)) {
-                        $detalle .= str_pad($value, mb_strlen($key));
-                        if ($band == 1) $headers .= $key;
-
-                    }elseif (mb_strlen($key) < mb_strlen($value)) {
-                        if ($band == 1) $headers .= str_pad($key, mb_strlen($value));
-                        $detalle .= $value;
+            
+                    if ($band == 1) {
+                        $header .= $key."\t";
                     }
-                    $detalle .= "\t";
-                    $headers .= "\t";
+                    $detail .= $value."\t";
+                    /*
+                    if (mb_strlen($key) > mb_strlen($value)) {
+                        $detail .= str_pad($value, mb_strlen($key));
+                        $header .= $key;
+                        //if ($band == 1) $header .= $key;
+            
+                    }elseif (mb_strlen($key) < mb_strlen($value)) {
+                        //if ($band == 1) $header .= str_pad($key, mb_strlen($value));
+                        $header .= str_pad($key, mb_strlen($value));
+                        $detail .= $value;
+                    }
+                    $detail .= "\t";
+                    $header .= "\t";
+                    */
                 }
-                $detalle .= "\n";
+                $detail .= "\n";
                 $band++;
             }
-
-            $texto = $headers."\n".$detalle;
-
+            
+            $texto = $main_header_det."\n".$header."\n".$detail;
+            $texto = iconv('UTF-8', 'Windows-1252', $texto);
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
             $newToday = $today->format("YmdHis");
@@ -157,8 +287,7 @@ class getTransferOrder {
             $fh = fopen($filename_det, 'w');
             fwrite($fh, $texto);
             fclose($fh);
-            
-            //return $data;
+                
             return [$filename_cab, $filename_det];
         }
     }

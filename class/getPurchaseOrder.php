@@ -1,4 +1,5 @@
 <?php
+
 class getPurchaseOrder {
 
     public static function item (string $internalId){
@@ -8,17 +9,18 @@ class getPurchaseOrder {
         $request->baseRef->internalId = $internalId;
         $request->baseRef->type = "purchaseOrder";
         $getResponse = $service->get($request);
-
+        //echo json_encode($res);
+        
         if (!$getResponse->readResponse->status->isSuccess) {
-            return $data = "";
+            return [0,0];;
         }else {
-           //PARA GENERAR ORDEN CABECERA
-           $res = $getResponse->readResponse->record;
+            $res = $getResponse->readResponse->record;
+            //PARA GENERAR ORDEN CABECERA
             $dN = '1';
             $tranId = 'PO'.$res->tranId;
-
+            
             $customfields = $res->customFieldList->customField;
-
+            
             foreach ($customfields as $field) {
                 if(isset($field->value->name)) {
                     switch ($field->value->typeId) {
@@ -37,7 +39,32 @@ class getPurchaseOrder {
             $NomProvCli = $res->billingAddress->addressee;
             $FechaOrdenRecibo = date('Ymd', strtotime(explode("T",$res->dueDate)[0]));
             $fechaEntrega = date('Ymd', strtotime(explode("T",$res->tranDate)[0]));
-
+            /*
+            $datos = array([
+                $dN,
+                $tranId,
+                $Origen,
+                $CodProvCli,
+                $NomProvCli,
+                $FechaOrdenRecibo
+            ]);
+            */
+            $field_cab = array(
+                'DocNum',
+                'NumAtCard',
+                'CARDCODE',
+                'U_BZ_ORIGEN',
+                'U_BZ_CODPROV',
+                'U_BZ_NOMPROV',
+                'DOCDATE',
+                'DOCDUEDATE',
+                'U_BZ_PAORIGEN',
+                'U_BZ_TP_CARGA',
+                'U_BZ_PROCVERIF',
+                'U_BZ_MUESTRA',
+                'U_SYP_MDMT'
+            );
+            
             $data = array(
                 'DocNum'                    => $dN,
                 'NumPedido'                 => $tranId,
@@ -49,14 +76,24 @@ class getPurchaseOrder {
                 'Fechaentrega'              => $fechaEntrega,
                 'PaisOrigen'                => "",
                 'TipoCarga'                 => "",
+                'ProcedimientoVerificación' => "",
                 'PorcentajeMuestreo'        => "",
+                'Motivo de traslado'        => "02"
             );
-
-            $headers = "";
-            $detalle = "";
-
+            
+            $main_header_cab = "";
+            $header = "";
+            $detail = "";
+            
+            foreach($field_cab as $value){
+                $main_header_cab .= $value."\t";
+            }
+            
             foreach ($data as $key => $value) {
-
+            
+                $header .= $key."\t";
+                $detail .= $value."\t";
+                /*
                 if (mb_strlen($key) > mb_strlen($value)) {
                     $detalle .= str_pad($value, mb_strlen($key));
                     $headers .= $key;
@@ -64,13 +101,13 @@ class getPurchaseOrder {
                     $headers .= str_pad($key, mb_strlen($value));
                     $detalle .= $value;
                 }
-
                 $headers .= "\t";
                 $detalle .= "\t";
+                    */
             }
-
-            $texto = $headers."\n".$detalle;
-
+            
+            $texto = $main_header_cab."\n".$header."\n".$detail;
+            
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
             $newToday = $today->format("YmdHis");
@@ -79,7 +116,8 @@ class getPurchaseOrder {
             $fh = fopen($filename_cab, 'w');
             fwrite($fh, $texto);
             fclose($fh);
-
+            
+            
             //PARA GENERAR ORDEN DETALLE
             if(isset($res->currencyName)){
                 switch ($res->currencyName) {
@@ -90,32 +128,65 @@ class getPurchaseOrder {
             }else{
                 $currencyName = "";
             }
-            
-            $itemList = $res->itemList->item;
 
+            $itemList = $res->itemList->item;
+            //echo json_encode($itemList);
+            
             $data = array();
             $cont = 0;
+            
+            $field_det = array(
+                'ParentKey',
+                'NumPedido',
+                'LineNum',
+                'ItemCode',
+                'QUANTITY',
+                'MeasureUnit',
+                'UnitsOfMeasurment',
+                'Currency',
+                'Price',
+                'U_BZ_TRA_ESPECIAL',
+                'WarehouseCode',
+                'UoMEntry'
+            
+            );
+            
             foreach($itemList as $value){
                 $info=array(
-                    'DocNum'                => $dN,
-                    'NumPedido'             => $tranId,
-                    'CorrelativoLinea'      => $cont,
-                    'CodigoArticulo'        => 'wo'.$value->item->internalId,
-                    'Cantidad'              => $value->quantity,
-                    'MonedaPrecio'          => $currencyName,
-                    'TratamientoEspecial'   => 'N',
-                    'CodigoAlmacen'         => 'L01',
-                    'UomEntry'              => '-1',
+                    'DocNum'                        => $dN,
+                    'NumPedido'                     => $tranId,
+                    'CorrelativoLinea'              => $cont,
+                    'CodigoArticulo'                => 'wo'.$value->item->internalId,
+                    'Cantidad'                      => $value->quantity,
+                    'UnidadMedidadeCantidad'	    => "UND", //cambiar,solo es referecial
+                    'UnidadesInventarioporCantidad' => '1',
+                    'MonedaPrecio'                  => $currencyName,
+                    'PrecioporCantidad'             => '1', //cambiar,solo es referecial
+                    'TratamientoEspecial'           => 'N',
+                    'CodigoAlmacen'                 => 'L01',
+                    'UomEntry'                      => '-1',
                 );
                 $cont++;
                 array_push($data, $info);
             }
-
-            $headers = "";
-            $detalle = "";
+            
+            $main_header_det = "";
+            $header = "";
+            $detail = "";
             $band = 1;
+            
+            foreach($field_det as $value){
+                $main_header_det .= $value."\t";
+            }
+            
             foreach ($data as $lista) {
                 foreach ($lista as $key => $value) {
+            
+                    if ($band == 1) {
+                        $header .= $key."\t";
+                    }
+                    $detail .= $value."\t";
+                    /*
                     if (mb_strlen($key) > mb_strlen($value)) {
                         $detalle .= str_pad($value, mb_strlen($key));
                         if ($band == 1) {
@@ -130,13 +201,14 @@ class getPurchaseOrder {
                         $detalle .= $value;
                     }
                     $detalle .= "\t";
+                    */
                 }
-                $detalle .= "\n";
+                $detail .= "\n";
                 $band++;
             }
-
-            $texto = $headers."\n".$detalle;
-
+            
+            $texto = $main_header_det."\n".$header."\n".$detail;
+            
             $today = new DateTime();
             $today->setTimezone(new DateTimeZone('America/Lima'));
             $newToday = $today->format("YmdHis");
@@ -145,8 +217,7 @@ class getPurchaseOrder {
             $fh = fopen($filename_det, 'w');
             fwrite($fh, $texto);
             fclose($fh);
-            
-            //return $data;
+
             return [$filename_cab, $filename_det];
         }
     }
