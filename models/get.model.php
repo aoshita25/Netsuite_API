@@ -22,14 +22,11 @@ class GetModel{
 
             case "articulo":
                 ftp_chdir($id_ftp, "/IN/INVENTORY/TEST");
-                $dir=ftp_pwd($id_ftp);
+                $dir = ftp_pwd($id_ftp);
                 $fileFrom = getInventory::item($id);
                 $fileTo = $dir."/".$fileFrom;
                 $upload = ftp_put($id_ftp, $fileTo, $fileFrom, FTP_ASCII);
-                if($fileFrom == 0){
-                    return "";
-                }
-                elseif(!$upload) {
+                if(!$upload) {
                     return 'Upload failed!';
                 } else{
                     return 'Upload success';
@@ -38,7 +35,7 @@ class GetModel{
     
             case "devolucion":
                 ftp_chdir($id_ftp, "/IN/RETURN/TEST");
-                $dir=ftp_pwd($id_ftp);
+                $dir = ftp_pwd($id_ftp);
                 [$fileFromCab, $fileFromDet] = getDevolucion::item($id);
                 $fileToCab = $dir."/".$fileFromCab;
                 $fileToDet = $dir."/".$fileFromDet;
@@ -56,7 +53,7 @@ class GetModel{
     
             case "orden":
                 ftp_chdir($id_ftp, "/IN/SOURCE/TEST");
-                $dir=ftp_pwd($id_ftp);
+                $dir = ftp_pwd($id_ftp);
                 [$fileFromCab, $fileFromDet] = getPurchaseOrder::item($id);
                 $fileToCab = $dir."/".$fileFromCab;
                 $fileToDet = $dir."/".$fileFromDet;
@@ -74,7 +71,7 @@ class GetModel{
     
             case "despacho":
                 ftp_chdir($id_ftp, "/IN/DELIVERY/TEST");
-                $dir=ftp_pwd($id_ftp);
+                $dir = ftp_pwd($id_ftp);
                 [$fileFromCab, $fileFromDet] = getTransferOrder::item($id);
                 $fileToCab = $dir."/".$fileFromCab;
                 $fileToDet = $dir."/".$fileFromDet;
