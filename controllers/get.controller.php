@@ -14,9 +14,15 @@ class GetController{
     }
 
     public function fncResponse($response){
-        if(!empty($response)){
+        if(!empty($response) && $response = "Upload success"){
             $json = array(
                 'status' => 200,
+                'result' => $response
+            );
+        }
+        elseif($response = "Upload failed!"){
+            $json = array(
+                'status' => 400,
                 'result' => $response
             );
         }
