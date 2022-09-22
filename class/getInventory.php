@@ -166,8 +166,8 @@ class getInventory {
             fwrite($fh, $texto);
             fclose($fh);
             
-            return $data;
-            //return $filename;
+            //return $data;
+            return $filename;
             
         }
     }

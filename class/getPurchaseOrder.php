@@ -141,8 +141,8 @@ class getPurchaseOrder {
             fwrite($fh, $texto);
             fclose($fh);
             
-            return $data;
-            //return [$filename_cab, $filename_det];
+            //return $data;
+            return [$filename_cab, $filename_det];
         }
     }
 }

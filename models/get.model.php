@@ -9,30 +9,75 @@ class GetModel{
 
     static public function getData($type,$id){
 
+        define("SERVER","20.94.40.28");
+        define("PORT","21");
+        define("USER","wow");
+        define("PASSWORD","W0VV$@792022");
+
+        $id_ftp=ftp_connect(SERVER,PORT) or die("No se pudo conectar");
+        ftp_login($id_ftp,USER,PASSWORD);
+        ftp_pasv($id_ftp,true);
+
         switch ($type){
 
             case "articulo":
-                $data = getInventory::item($id);
-                return $data;
+                ftp_chdir($id_ftp, "/IN/INVENTORY/TEST");
+                $dir=ftp_pwd($id_ftp);
+                $fileFrom = getInventory::item($id);
+                $fileTo = $dir."/".$fileFrom;
+                $upload = ftp_put($id_ftp, $fileTo, $fileFrom, FTP_ASCII);
+                if (!$upload) {
+                    return 'Upload failed!';
+                } else {
+                    return 'Upload success';
+                }
                 break;
     
             case "devolucion":
-                $data = getDevolucion::item($id);
-                return $data;
-                //[$fileFromCab, $fileFromDet] = getDevolucion::item($id);
+                ftp_chdir($id_ftp, "/IN/RETURN/TEST");
+                $dir=ftp_pwd($id_ftp);
+                [$fileFromCab, $fileFromDet] = getDevolucion::item($id);
+                $fileToCab = $dir."/".$fileFromCab;
+                $fileToDet = $dir."/".$fileFromDet;
+                $uploadCab = ftp_put($id_ftp, $fileToCab, $fileFromCab, FTP_ASCII);
+                $uploadDet = ftp_put($id_ftp, $fileToDet, $fileFromDet, FTP_ASCII);
+                if (!$uploadCab || !$uploadDet) {
+                    return 'Upload failed!';
+                } else {
+                    return 'Upload success';
+                }
                 break;
     
             case "orden":
-                $data = getPurchaseOrder::item($id);
-                return $data;
-                //[$fileFromCab, $fileFromDet] = getPurchaseOrder::item($id);
+                ftp_chdir($id_ftp, "/IN/SOURCE/TEST");
+                $dir=ftp_pwd($id_ftp);
+                [$fileFromCab, $fileFromDet] = getPurchaseOrder::item($id);
+                $fileToCab = $dir."/".$fileFromCab;
+                $fileToDet = $dir."/".$fileFromDet;
+                $uploadCab = ftp_put($id_ftp, $fileToCab, $fileFromCab, FTP_ASCII);
+                $uploadDet = ftp_put($id_ftp, $fileToDet, $fileFromDet, FTP_ASCII);
+                if (!$uploadCab || !$uploadDet) {
+                    return 'Upload failed!';
+                } else {
+                    return 'Upload success';
+                }
                 break;
     
             case "despacho":
-                $data = getTransferOrder::item($id);
-                return $data;
-                //[$fileFromCab, $fileFromDet] = getTransferOrder::item($id);
+                ftp_chdir($id_ftp, "/IN/DELIVERY/TEST");
+                $dir=ftp_pwd($id_ftp);
+                [$fileFromCab, $fileFromDet] = getTransferOrder::item($id);
+                $fileToCab = $dir."/".$fileFromCab;
+                $fileToDet = $dir."/".$fileFromDet;
+                $uploadCab = ftp_put($id_ftp, $fileToCab, $fileFromCab, FTP_ASCII);
+                $uploadDet = ftp_put($id_ftp, $fileToDet, $fileFromDet, FTP_ASCII);
+                if (!$uploadCab || !$uploadDet) {
+                    return 'Upload failed!';
+                } else {
+                    return 'Upload success';
+                }
                 break;
         }
+        ftp_quit($id_ftp);
     } 
 }
