@@ -25,7 +25,7 @@ class GetModel{
                 $dir = ftp_pwd($id_ftp);
                 $fileFrom = getInventory::item($id);
                 $fileTo = $dir."/".$fileFrom;
-                $upload = ftp_put($id_ftp, $fileTo, "../".$fileFrom, FTP_ASCII);
+                $upload = ftp_put($id_ftp, $fileTo, $fileFrom, FTP_ASCII);
                 if(!$upload) {
                     return 'Upload failed!';
                 } else{

@@ -39,16 +39,17 @@ class getPurchaseOrder {
             $NomProvCli = $res->billingAddress->addressee;
             $FechaOrdenRecibo = date('Ymd', strtotime(explode("T",$res->dueDate)[0]));
             $fechaEntrega = date('Ymd', strtotime(explode("T",$res->tranDate)[0]));
-            /*
-            $datos = array([
-                $dN,
-                $tranId,
-                $Origen,
-                $CodProvCli,
-                $NomProvCli,
-                $FechaOrdenRecibo
-            ]);
-            */
+            $PaisOrigen = ucfirst(explode("_",$res->billingAddress->country)[1]);
+
+            $country_names = json_decode(file_get_contents("http://country.io/names.json"), true);
+            
+            foreach($country_names as $key => $val) {
+                if($val == $PaisOrigen){
+                    $PaisOrigen = $key;
+                    break;
+                }
+            }
+            
             $field_cab = array(
                 'DocNum',
                 'NumAtCard',
@@ -74,7 +75,7 @@ class getPurchaseOrder {
                 'NombreProveedorCliente'    => $NomProvCli,
                 'FechaOrdenRecibo'          => $FechaOrdenRecibo,
                 'Fechaentrega'              => $fechaEntrega,
-                'PaisOrigen'                => "",
+                'PaisOrigen'                => $PaisOrigen,
                 'TipoCarga'                 => "",
                 'ProcedimientoVerificación' => "",
                 'PorcentajeMuestreo'        => "",
@@ -148,7 +149,6 @@ class getPurchaseOrder {
                 'U_BZ_TRA_ESPECIAL',
                 'WarehouseCode',
                 'UoMEntry'
-            
             );
             
             foreach($itemList as $value){
@@ -161,7 +161,7 @@ class getPurchaseOrder {
                     'UnidadMedidadeCantidad'	    => "UND", //cambiar,solo es referecial
                     'UnidadesInventarioporCantidad' => '1',
                     'MonedaPrecio'                  => $currencyName,
-                    'PrecioporCantidad'             => '1', //cambiar,solo es referecial
+                    'PrecioporCantidad'             => $value->rate,
                     'TratamientoEspecial'           => 'N',
                     'CodigoAlmacen'                 => 'L01',
                     'UomEntry'                      => '-1',

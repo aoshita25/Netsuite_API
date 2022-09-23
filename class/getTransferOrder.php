@@ -83,8 +83,8 @@ class getTransferOrder {
             $fechaEntrega = date('Ymd', strtotime(explode("T",$res->shipDate)[0]));
             
             $customfields = $res->customFieldList->customField;
+            
             foreach ($customfields as $field) {
-                //echo json_encode($field);
                 switch ($field->scriptId) {
                     case "custbody24":
                         $RucCliCliSolum = $field->value;
@@ -95,10 +95,27 @@ class getTransferOrder {
                     case "custbody23":
                         $UbigeoDir = $field->value;
                         break;
+                    case "custbody8":
+                        $proyecto = $field->value->name;
+                        break;
+                    case "custbody19":
+                        $contratista = $field->value;
+                        break;
+                    case "custbody20":
+                        $teleCont = $field->value;
+                        break;
+                    case "custbody12":
+                        $supervisor = $field->value->name;
+                        break;
+                    case "custbody22":
+                        $telefSup = $field->value;
+                        break;
                     default:
                     $UbigeoDir = "";
                 }
             }
+            
+            $obs = $proyecto."|".$tranId."|".$contratista."|".$teleCont."|".$teleCont."|".$supervisor."|".$telefSup;            
             
             $field_cab = array(
                 'DocNum',
@@ -150,7 +167,7 @@ class getTransferOrder {
                 'HoraFin'                       => "",
                 'TipoCanal'                     => $clase,
                 'LoteFacturacion'               => "",
-                'Observacion'                   => "", //revisar
+                'Observacion'                   => $obs,
                 'Punto de Llegada'              => $DirEntrega,
                 'CondicionesPago2'              => "-1",
             );
