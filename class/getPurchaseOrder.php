@@ -125,6 +125,12 @@ class getPurchaseOrder {
                     case "US Dollar":
                         $currencyName = 'USD';
                         break;
+                    case "Sol":
+                        $currencyName = 'SOL';
+                        break;
+                    default:
+                        $currencyName = "";
+            
                 }
             }else{
                 $currencyName = "";
