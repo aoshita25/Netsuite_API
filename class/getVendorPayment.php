@@ -12,6 +12,7 @@ Class getVendorPayment {
         $request->baseRef->type = "vendorPayment";
         $getVendorPayment = $service->get($request);
         $paymentvendor=$getVendorPayment->readResponse->record;
+        //echo json_encode($paymentvendor);
 
         //campos de Vendor en payment
         $vendor_id = ($paymentvendor->entity->internalId);//ID proveedor
@@ -36,11 +37,12 @@ Class getVendorPayment {
         //navegacion en los documentos pagados
         $lppayment = sizeof($paymentvendor->applyList->apply);
         $test = $paymentvendor->applyList->apply;
-
+        $suma_importe = 0;
+        $sum_calculo = 0;
+        $cont = 0;
         for ($i = 0, $l = $lppayment; $i<$l ; $i++){
             $ar = ($test)[$i];
             $id = $ar->apply;
-            
             if ($id == true){
                 $invoice_id = ($ar->doc);//ID Factura
                 $date_apply = ($ar->applyDate);//fecha vencimiento factura
@@ -146,25 +148,47 @@ Class getVendorPayment {
                 $invoiceduedate = date("Ymd", strtotime($duedateinvoice));
                 $nroInvoice = $Serie_invoice."-".$Correlativo_invoice;
                 $moduloRaiz = rand(50, 99);
-                $digControl = "XX";
+                //$digControl = "XX";
+                $nroConvenio = 9654;
+                $sumatoria = $nroConvenio+substr($paymentdate,2)+substr($importe_neto,1,8)+$moneda+$formapago+substr($CCIVendor,-7)+substr($CCI,-7);
+                $factores = array(1,2,3,4,5,6,7,8,9);
+                $sumatoria = $sumatoria*pow(10,count($factores)-strlen($sumatoria));
+                $digitos = str_split($sumatoria);
+                $productos = [];
+                foreach($digitos as $key => $value){
+                    array_push($productos, $value*$factores[$key]);
+                }
+                $calculo = $moduloRaiz-(array_sum($productos)%$moduloRaiz);
+                $digControl = str_pad($calculo, 2, "0", STR_PAD_LEFT);
+
                 if ($SN_tp == 6) {
                     $Subtp_pago = ' ';//Sub tipo de pago (Tabla 04)
                 }else {
                     $Subtp_pago = '@';//Sub tipo de pago (Tabla 04)
                 };
-                if ($type_apply == 'Factura de compra') {
+                if ($type_apply == 'Bill') {
                     $Signo = '+';//Signo el sistema
                 }else {
                     $Signo = '-';//Signo el sistema
                 };
- 
-                $concatenado=$Tipo_orden.$ref1y2.$moneda.$CCI.$paymentdate.$SN_RUC.$SN_RS.$formapago.$CCIVendor.$invoicedate.$invoiceduedate.$nroInvoice.$importe_neto.$moduloRaiz.$digControl.$Subtp_pago.$Signo.$mail;
+                $suma_importe += $amount;
+                $sum_calculo += $calculo;
+                $ref1 = str_pad("F".$nombrearchivo,15,"0",STR_PAD_LEFT);
+                $ref2 = str_pad("0",16,"0",STR_PAD_RIGHT);
+                $concatenado=$Tipo_orden.$ref1.$ref2.$moneda.$CCI.$paymentdate.$SN_RUC.$SN_RS.$formapago.$CCIVendor.$invoicedate.$invoiceduedate.$nroInvoice.$importe_neto.$moduloRaiz.$digControl.$Subtp_pago.$Signo.$mail;
                 $fi = fopen("F".$nombrearchivo.".txt","a");
 
                 fputs($fi,$concatenado);
                 fputs($fi,"\n");
+                $cont++;
             }
         }
+        //Registro de control
+        $cantidad_registro = str_pad($cont,6,"0",STR_PAD_LEFT);
+        $importe_total = str_pad($suma_importe,15,"0",STR_PAD_LEFT);
+        $sum_dig_cheq = str_pad($sum_calculo,6,"0",STR_PAD_LEFT);
+        $texto="99".$cantidad_registro.$importe_total.$paymentdate.$sum_dig_cheq;
+        fputs($fi,$texto);
         fclose($fi);
         return $nombrearchivo;
     }
